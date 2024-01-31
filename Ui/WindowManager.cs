@@ -4,7 +4,7 @@ using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
-namespace ImGuiTeste.Ui;
+namespace MipsSimulator.Ui;
 
 public sealed class WindowManager : IDisposable
 {

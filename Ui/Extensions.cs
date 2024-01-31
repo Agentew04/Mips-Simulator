@@ -1,4 +1,4 @@
-﻿namespace ImGuiTeste.Ui;
+﻿namespace MipsSimulator.Ui;
 
 /// <summary>
 /// Provides many useful extension methods

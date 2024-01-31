@@ -1,9 +1,9 @@
 ﻿using ImGuiNET;
-using ImGuiTeste.Ui;
+using MipsSimulator.Ui;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace ImGuiTeste;
+namespace MipsSimulator;
 
 public class Program {
 

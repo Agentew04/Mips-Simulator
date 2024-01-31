@@ -14,7 +14,7 @@ using Veldrid;
 using System.Runtime.CompilerServices;
 using ImGuiNET;
 
-namespace ImGuiTeste.Ui
+namespace MipsSimulator.Ui
 {
     /// <summary>
     /// A modified version of Veldrid.ImGui's ImGuiRenderer.

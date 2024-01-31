@@ -1,4 +1,4 @@
-﻿namespace ImGuiTeste.Mips; 
+﻿namespace MipsSimulator.Mips; 
 
 /// <summary>
 /// Structure to hold the values of all main registers of the CPU.

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using Vortice.Direct3D11;
 
-namespace ImGuiTeste.Ui;
+namespace MipsSimulator.Ui;
 public class LogicThread
 {
 
