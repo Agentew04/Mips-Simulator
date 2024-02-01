@@ -3,7 +3,7 @@
 /// <summary>
 /// Structure to hold the values of all main registers of the CPU.
 /// </summary>
-public class CpuRegisters {
+public class CpuRegisters : IResettable {
 
     private uint[] registers = new uint[32];
     private uint pc = 0x0;

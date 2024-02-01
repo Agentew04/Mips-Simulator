@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using MipsSimulator.Mips;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ using Vortice.Direct3D11;
 namespace MipsSimulator.Ui;
 public class LogicThread
 {
+
+    private Cpu cpu;
 
     public LogicThread(WindowManager windowManager)
     {
@@ -35,6 +38,13 @@ public class LogicThread
 
     private async void Main()
     {
+        cpu = new();   
+        
+        // small program
+        cpu.Memory.WriteWord(0, 0x24080001); // li t0, 1
+        cpu.Memory.WriteWord(4, 0x24090002); // li t1, 2
+        cpu.Memory.WriteWord(8, 0x01095020); // add t2, t0, t1
+
         int i = 0;
         using PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
         while (await timer.WaitForNextTickAsync(cts.Token).NoThrow())
@@ -73,18 +83,18 @@ public class LogicThread
             ImGui.EndMainMenuBar();
         }
 
-
+        // pelo visto as docks vao sempre na esquerda
         ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
-        ImGui.ShowDemoWindow();
-
-        ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
-        if (ImGui.Begin("SMS - Simple MIPS Simulator"))
-        {
+        if(ImGui.Begin("Console")) {
             ImGui.Text("Hello World!");
-            if (ImGui.Button("Close"))
-            {
-                windowManager.CloseWindow();
-            }
+            ImGui.End();
+        }
+        //ImGui.ShowDemoWindow();
+
+        ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
+        if (ImGui.Begin("Registers"))
+        {
+            ShowRegistersTable();
             ImGui.End();
         }
     }
@@ -148,6 +158,32 @@ public class LogicThread
         }
 
         ImGui.End();
+    }
+
+    private void ShowRegistersTable() {
+        ImGui.BeginTable("Registers", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit);
+
+        // setup headers
+        // Name - Number - Value
+        ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.None);
+        ImGui.TableSetupColumn("Number", ImGuiTableColumnFlags.None);
+        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.None);
+        ImGui.TableHeadersRow();
+ 
+        foreach(Register r in Enum.GetValues<Register>()) {
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn();
+            ImGui.Text(r.ToString());
+            ImGui.TableNextColumn();
+            string regNumber = ((int)r).ToString();
+            if(r is >= Register.Pc) {
+                regNumber = "";
+            }
+            ImGui.Text(regNumber);
+            ImGui.TableNextColumn();
+            ImGui.Text(cpu.Registers.GetRegister(r).ToString());
+        }
+        ImGui.EndTable();
     }
 
     #endregion
