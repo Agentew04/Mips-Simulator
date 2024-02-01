@@ -2,9 +2,9 @@
 
 public class TypeIInstruction : IInstruction {
 
-    public uint Rs { get; init; }
+    public Register Rs { get; init; }
 
-    public uint Rt { get; init; }
+    public Register Rt { get; init; }
 
     public short Immediate { get; init; }
 

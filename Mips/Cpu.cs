@@ -60,13 +60,14 @@ public partial class Cpu : IResettable {
         uint rs = (instruction >> 21) & 0x1F;
         uint rt = (instruction >> 16) & 0x1F;
         uint rd = (instruction >> 11) & 0x1F;
+
         uint shamt = (instruction >> 6) & 0x1F;
         Function funct = (Function)(instruction & 0x3F);
 
         return new TypeRInstruction {
-            Rs = rs,
-            Rt = rt,
-            Rd = rd,
+            Rs = (Register)rs,
+            Rt = (Register)rt,
+            Rd = (Register)rd,
             Shamt = shamt,
             Function = funct
         };
@@ -79,8 +80,8 @@ public partial class Cpu : IResettable {
         Opcode opcode = (Opcode)((instruction >> 26) & 0x3F);
 
         return new TypeIInstruction {
-            Rs = rs,
-            Rt = rt,
+            Rs = (Register)rs,
+            Rt = (Register)rt,
             Immediate = immediate,
             Opcode = opcode
         };
@@ -101,6 +102,99 @@ public partial class Cpu : IResettable {
     #region Execute
 
     private void Execute(IInstruction instruction) {
+        if(instruction is TypeRInstruction r) {
+            ExecuteTypeR(r);
+        } else if(instruction is TypeIInstruction i) {
+            ExecuteTypeI(i);
+        } else if(instruction is TypeJInstruction j) {
+            ExecuteTypeJ(j);
+        }
+    }
+
+    private void ExecuteTypeR(TypeRInstruction instruction) {
+        switch (instruction.Function) {
+            case Function.Sll:
+                break;
+            case Function.Srl:
+                break;
+            case Function.Sra:
+                break;
+            case Function.Sllv:
+                break;
+            case Function.Srlv:
+                break;
+            case Function.Srav:
+                break;
+            case Function.Jr:
+                Registers.SetRegister(Register.Pc, Registers.GetRegister(instruction.Rs));
+                break;
+            case Function.Jalr:
+                Registers.SetRegister(Register.Ra, Registers.GetRegister(Register.Pc));
+                Registers.SetRegister(Register.Pc, Registers.GetRegister(instruction.Rs));
+                break;
+            case Function.Syscall:
+                Syscall();
+                break;
+            case Function.Mfhi:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(Register.Hi));
+                break;
+            case Function.Mthi:
+                Registers.SetRegister(Register.Hi, Registers.GetRegister(instruction.Rs));
+                break;
+            case Function.Mflo:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(Register.Lo));
+                break;
+            case Function.Mtlo:
+                Registers.SetRegister(Register.Lo, Registers.GetRegister(instruction.Rs));
+                break;
+            case Function.Mult:
+            case Function.Multu:
+                long result = Registers.GetRegister(instruction.Rs) * Registers.GetRegister(instruction.Rt);
+                Registers.SetRegister(Register.Lo, (uint)result);
+                Registers.SetRegister(Register.Hi, (uint)(result >> 32));
+
+                break;
+            case Function.Div:
+            case Function.Divu:
+                Registers.SetRegister(Register.Lo, Registers.GetRegister(instruction.Rs) / Registers.GetRegister(instruction.Rt));
+                Registers.SetRegister(Register.Hi, Registers.GetRegister(instruction.Rs) % Registers.GetRegister(instruction.Rt));
+                break;
+            case Function.Add:
+            case Function.Addu:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rs) + Registers.GetRegister(instruction.Rt));
+                break;
+            case Function.Sub:
+            case Function.Subu:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rs) - Registers.GetRegister(instruction.Rt));
+                break;
+            case Function.And:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rs) & Registers.GetRegister(instruction.Rt));
+                break;
+            case Function.Or:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rs) | Registers.GetRegister(instruction.Rt));
+                break;
+            case Function.Xor:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rs) ^ Registers.GetRegister(instruction.Rt));
+                break;
+            case Function.Nor:
+                Registers.SetRegister(instruction.Rd, ~(Registers.GetRegister(instruction.Rs) | Registers.GetRegister(instruction.Rt)));
+                break;
+            case Function.Slt:
+            case Function.Sltu:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rs) < Registers.GetRegister(instruction.Rt) ? 1u : 0u);
+                break;
+        }
+    }
+
+    private void ExecuteTypeI(TypeIInstruction instruction) {
+
+    }
+
+    private void ExecuteTypeJ(TypeJInstruction instruction) {
+
+    }
+
+    private void Syscall() {
 
     }
 

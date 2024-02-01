@@ -80,6 +80,10 @@ public class LogicThread
                 ImGui.MenuItem("Save As", "CTRL+SHIFT+S");
                 ImGui.EndMenu();
             }
+
+            if (ImGui.MenuItem("Step")) {
+                cpu.Step();
+            }
             ImGui.EndMainMenuBar();
         }
 

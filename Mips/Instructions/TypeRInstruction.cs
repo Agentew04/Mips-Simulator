@@ -8,11 +8,11 @@ namespace MipsSimulator.Mips.Instructions;
 
 public class TypeRInstruction : IInstruction {
 
-    public uint Rs { get; init; }
+    public Register Rs { get; init; }
 
-    public uint Rt { get; init; }
+    public Register Rt { get; init; }
 
-    public uint Rd { get; init; }
+    public Register Rd { get; init; }
 
     public uint Shamt { get; init; }
 
