@@ -187,11 +187,88 @@ public partial class Cpu : IResettable {
     }
 
     private void ExecuteTypeI(TypeIInstruction instruction) {
+        uint branch(uint addr, int offset) {
+            uint newAddr;
+            if (offset > 0) {
+                newAddr = addr + (uint)offset;
+            } else {
+                newAddr = addr - (uint)(-offset);
+            }
+            return newAddr;
+        }
 
+        switch (instruction.Opcode) {
+            case Opcode.Beq:
+                if(Registers.GetRegister(instruction.Rs) == Registers.GetRegister(instruction.Rt)) {
+                    Registers.SetRegister(Register.Pc, branch(Registers.GetRegister(Register.Pc), instruction.Immediate << 2));
+                }
+                break;
+            case Opcode.Bne:
+                if(Registers.GetRegister(instruction.Rs) != Registers.GetRegister(instruction.Rt)) {
+                    Registers.SetRegister(Register.Pc, branch(Registers.GetRegister(Register.Pc), instruction.Immediate << 2));
+                }
+                break;
+            case Opcode.Blez:
+                if((int)Registers.GetRegister(instruction.Rs) <= 0) {
+                    Registers.SetRegister(Register.Pc, branch(Registers.GetRegister(Register.Pc), instruction.Immediate << 2));
+                }
+                break;
+            case Opcode.Bgtz:
+                if((int)Registers.GetRegister(instruction.Rs) > 0) {
+                    Registers.SetRegister(Register.Pc, branch(Registers.GetRegister(Register.Pc), instruction.Immediate << 2));
+                }
+                break;
+            case Opcode.Addi:
+                Registers.SetRegister(instruction.Rt, Registers.GetRegister(instruction.Rs) + (uint)instruction.Immediate);
+                break;
+            case Opcode.Addiu:
+                Registers.SetRegister(instruction.Rt, Registers.GetRegister(instruction.Rs) + (uint)instruction.Immediate);
+                break;
+            case Opcode.Slti:
+                break;
+            case Opcode.Sltiu:
+                break;
+            case Opcode.Andi:
+                break;
+            case Opcode.Ori:
+                break;
+            case Opcode.Xori:
+                break;
+            case Opcode.Llo:
+                break;
+            case Opcode.Lhi:
+                break;
+            case Opcode.Trap:
+                break;
+            case Opcode.Lb:
+                break;
+            case Opcode.Lh:
+                break;
+            case Opcode.Lw:
+                break;
+            case Opcode.Lbu:
+                break;
+            case Opcode.Lhu:
+                break;
+            case Opcode.Sb:
+                break;
+            case Opcode.Sh:
+                break;
+            case Opcode.Sw:
+                break;
+        }
     }
 
     private void ExecuteTypeJ(TypeJInstruction instruction) {
-
+        switch (instruction.Opcode) {
+            case Opcode.J:
+                Registers.SetRegister(Register.Pc, (Registers.GetRegister(Register.Pc) & 0xF0000000) | (instruction.Address << 2));
+                break;
+            case Opcode.Jal:
+                Registers.SetRegister(Register.Ra, Registers.GetRegister(Register.Pc));
+                Registers.SetRegister(Register.Pc, (Registers.GetRegister(Register.Pc) & 0xF0000000) | (instruction.Address << 2));
+                break;
+        }
     }
 
     private void Syscall() {
