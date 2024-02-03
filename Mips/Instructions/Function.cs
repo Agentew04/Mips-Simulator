@@ -1,11 +1,31 @@
 ﻿namespace MipsSimulator.Mips.Instructions;
 
 public enum Function : byte {
+    /// <summary>
+    /// Shift left logical. Shifts RT left by SHAMT and stores the result in RD
+    /// </summary>
     Sll = 0b000_000,
+    /// <summary>
+    /// Shift right logical. Shifts RT right by SHAMT and stores the result in RD
+    /// </summary>
     Srl = 0b000_010,
+    /// <summary>
+    /// Shift right arithmetic. Shifts RT right by SHAMT and stores the result in RD.
+    /// Replaces the shifted bits with the sign bit
+    /// </summary>
     Sra = 0b000_011,
+    /// <summary>
+    /// Shift left logical variable. Shifts RT left by the value in RS and stores the result in RD
+    /// </summary>
     Sllv = 0b000_100,
+    /// <summary>
+    /// Shift right logical variable. Shifts RT right by the value in RS and stores the result in RD
+    /// </summary>
     Srlv = 0b000_110,
+    /// <summary>
+    /// Shift right arithmetic variable. Shifts RT right by the value in RS and stores the result in RD.
+    /// Replaces the shifted bits with the sign bit
+    /// </summary>
     Srav = 0b000_111,
 
     /// <summary>

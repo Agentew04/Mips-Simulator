@@ -1,12 +1,15 @@
-﻿using System.Diagnostics;
+﻿using ImGuiNET;
+using System.Diagnostics;
 using System.Numerics;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
-namespace MipsSimulator.Ui;
+namespace MipsSimulator.Ui.Veldrid;
 
-public sealed class WindowManager : IDisposable
+public sealed class WindowManager : IDisposable, IWindowManager
 {
 
     #region Private Variables
@@ -16,6 +19,7 @@ public sealed class WindowManager : IDisposable
     private CommandList commandList = null!;
     private ImGuiController imGuiRenderer = null!;
     private bool closeWindow = false;
+    private ImFontPtr font;
 
     #endregion
 
@@ -47,12 +51,16 @@ public sealed class WindowManager : IDisposable
         };
         commandList = graphicsDevice.ResourceFactory.CreateCommandList();
         imGuiRenderer = new ImGuiController(graphicsDevice, graphicsDevice.MainSwapchain.Framebuffer.OutputDescription, window.Width, window.Height);
+
+        LoadFont();
+
     }
 
-    public void StartMainLoop()
+    public void Start()
     {
         Stopwatch sw = new();
         float deltaTime;
+        ImGui.PushFont(font);
 
         while (window.Exists && !closeWindow)
         {
@@ -76,9 +84,26 @@ public sealed class WindowManager : IDisposable
             graphicsDevice.SubmitCommands(commandList);
             graphicsDevice.SwapBuffers(graphicsDevice.MainSwapchain);
         }
-
+        ImGui.PopFont();
         graphicsDevice.WaitForIdle();
         OnCloseWindow?.Invoke();
+    }
+
+    private unsafe void LoadFont()
+    {
+        Assembly asm = Assembly.GetExecutingAssembly();
+        using Stream? s = asm.GetManifestResourceStream("Resources/Fonts/JetBrainsMono-Regular.ttf");
+        if (s is null)
+        {
+            return;
+        }
+
+        byte[] buffer = new byte[s.Length];
+        s.Read(buffer);
+        fixed (byte* bufferPtr = buffer)
+        {
+            font = ImGui.GetIO().Fonts.AddFontFromMemoryTTF((nint)bufferPtr, buffer.Length, 16);
+        }
     }
 
     public void Dispose()

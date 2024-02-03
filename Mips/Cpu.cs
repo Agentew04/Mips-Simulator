@@ -13,6 +13,8 @@ namespace MipsSimulator.Mips;
 /// </summary>
 public partial class Cpu : IResettable {
 
+    private bool executing = false;
+
     /// <summary>
     /// A class containing the registers of the CPU
     /// </summary>
@@ -41,6 +43,23 @@ public partial class Cpu : IResettable {
         // pc+4 in the 'end' of the cycle (low border)
         Registers.SetRegister(Register.Pc, Registers.GetRegister(Register.Pc) + 4); 
     }
+
+    public async Task Continue() {
+        executing = true;
+        while (executing) {
+            Console.WriteLine("Step");
+            Step();
+            Console.WriteLine("Yield");
+            await Task.Delay(1000);
+            await Task.Yield();
+        }
+    }
+
+    public void Stop() {
+        executing = false;
+    }
+
+
 
     public void Reset() {
         Registers.Reset();

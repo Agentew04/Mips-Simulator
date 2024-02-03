@@ -1,21 +1,17 @@
 ﻿using ImGuiNET;
 using MipsSimulator.Mips;
+using MipsSimulator.Ui.Widgets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using System.Timers;
-using Vortice.Direct3D11;
 
 namespace MipsSimulator.Ui;
-public class LogicThread
-{
 
-    private Cpu cpu;
-
-    public LogicThread(WindowManager windowManager)
+public class LogicThread {
+    public LogicThread(IWindowManager windowManager)
     {
         this.windowManager = windowManager;
         cts = new();
@@ -30,15 +26,20 @@ public class LogicThread
 
     #region Private Variables
 
-    private readonly WindowManager windowManager;
+    private readonly IWindowManager windowManager;
     private readonly Thread thread;
     private readonly CancellationTokenSource cts;
+    private Cpu cpu;
+    private RegisterTable registerTable;
+    private ConsoleLog consoleLog;
 
     #endregion
 
     private async void Main()
     {
-        cpu = new();   
+        cpu = new();
+        registerTable = new(cpu.Registers);
+        consoleLog = new();
         
         // small program
         cpu.Memory.WriteWord(0, 0x24080001); // li t0, 1
@@ -82,25 +83,30 @@ public class LogicThread
             }
 
             if (ImGui.MenuItem("Step")) {
+                consoleLog.WriteMessage("Step");
                 cpu.Step();
+            }
+
+            if (ImGui.MenuItem("Continue")) {
+                consoleLog.WriteMessage("Continue");
+                cpu.Continue();
+            }
+
+            if (ImGui.MenuItem("Stop")) {
+                consoleLog.WriteMessage("stop");
+                cpu.Stop();
             }
             ImGui.EndMainMenuBar();
         }
 
         // pelo visto as docks vao sempre na esquerda
         ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
-        if(ImGui.Begin("Console")) {
-            ImGui.Text("Hello World!");
-            ImGui.End();
-        }
-        //ImGui.ShowDemoWindow();
+        ImGui.ShowDemoWindow();
 
         ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
-        if (ImGui.Begin("Registers"))
-        {
-            ShowRegistersTable();
-            ImGui.End();
-        }
+        consoleLog.Show();
+        ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
+        registerTable.Show();
     }
 
     private void CreateDockSpace(bool fullscreen, bool padding)
@@ -164,31 +170,6 @@ public class LogicThread
         ImGui.End();
     }
 
-    private void ShowRegistersTable() {
-        ImGui.BeginTable("Registers", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingFixedFit);
-
-        // setup headers
-        // Name - Number - Value
-        ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.None);
-        ImGui.TableSetupColumn("Number", ImGuiTableColumnFlags.None);
-        ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.None);
-        ImGui.TableHeadersRow();
- 
-        foreach(Register r in Enum.GetValues<Register>()) {
-            ImGui.TableNextRow();
-            ImGui.TableNextColumn();
-            ImGui.Text(r.ToString());
-            ImGui.TableNextColumn();
-            string regNumber = ((int)r).ToString();
-            if(r is >= Register.Pc) {
-                regNumber = "";
-            }
-            ImGui.Text(regNumber);
-            ImGui.TableNextColumn();
-            ImGui.Text(cpu.Registers.GetRegister(r).ToString());
-        }
-        ImGui.EndTable();
-    }
 
     #endregion
 }

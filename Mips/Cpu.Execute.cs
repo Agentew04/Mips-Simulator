@@ -16,16 +16,34 @@ public partial class Cpu {
     private void ExecuteTypeR(TypeRInstruction instruction) {
         switch (instruction.Function) {
             case Function.Sll:
-                break;
-            case Function.Srl:
-                break;
-            case Function.Sra:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rt) << (int)instruction.Shamt);
                 break;
             case Function.Sllv:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rt) << (int)Registers.GetRegister(instruction.Rs));
                 break;
-            case Function.Srlv:
+            case Function.Sra:
+                bool sign = (Registers.GetRegister(instruction.Rt) & 0x80000000) != 0;
+                uint shiftMask = 0xFFFFFFFF << (32 - (int)instruction.Shamt);
+                uint shiftedValue = Registers.GetRegister(instruction.Rt) >> (int)instruction.Shamt;
+                if (sign) {
+                    shiftedValue |= shiftMask;
+                }
+                Registers.SetRegister(instruction.Rd, shiftedValue);
                 break;
             case Function.Srav:
+                sign = (Registers.GetRegister(instruction.Rt) & 0x80000000) != 0;
+                shiftMask = 0xFFFFFFFF << (32 - (int)Registers.GetRegister(instruction.Rs));
+                shiftedValue = Registers.GetRegister(instruction.Rt) >> (int)Registers.GetRegister(instruction.Rs);
+                if (sign) {
+                    shiftedValue |= shiftMask;
+                }
+                Registers.SetRegister(instruction.Rd, shiftedValue);
+                break;
+            case Function.Srl:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rt) >> (int)instruction.Shamt);
+                break;
+            case Function.Srlv:
+                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rt) >> (int)Registers.GetRegister(instruction.Rs));
                 break;
             case Function.Jr:
                 Registers.SetRegister(Register.Pc, Registers.GetRegister(instruction.Rs));
