@@ -15,6 +15,11 @@ public class CpuRegisters : IResettable {
         set => registers[index] = value;
     }
 
+    public uint this[Register r] {
+        get => GetRegister(r);
+        set => SetRegister(r, value);
+    }
+
     public void SetRegister(Register r, uint value) {
         if (r == Register.Zero) {
             return;

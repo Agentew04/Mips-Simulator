@@ -57,7 +57,7 @@ public class Memory : IResettable {
         Array.Clear(memory, 0, memory.Length);
     }
 
-    public void SetByte(uint index, byte value) {
+    public void WriteByte(uint index, byte value) {
         memory[index] = value;
     }
 
@@ -84,7 +84,7 @@ public class Memory : IResettable {
         memory[index + 7] = (byte)value;
     }
 
-    public byte GetByte(uint index) {
+    public byte ReadByte(uint index) {
         return memory[index];
     }
 
