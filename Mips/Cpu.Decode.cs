@@ -1,11 +1,6 @@
 ﻿using MipsSimulator.Mips.Instructions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MipsSimulator.Mips; 
+namespace MipsSimulator.Mips;
 public partial class Cpu {
 
     private IInstruction Decode(uint instruction) {

@@ -3,8 +3,7 @@
 /// <summary>
 /// Provides many useful extension methods
 /// </summary>
-public static class Extensions
-{
+public static class Extensions {
 
     /// <summary>
     /// Awaits a ValueTask and returns false if it was canceled 
@@ -12,15 +11,11 @@ public static class Extensions
     /// </summary>
     /// <param name="valueTask"></param>
     /// <returns>The original value or false if it was cancelled</returns>
-    public static async ValueTask<bool> NoThrow(this ValueTask<bool> valueTask)
-    {
-        try
-        {
+    public static async ValueTask<bool> NoThrow(this ValueTask<bool> valueTask) {
+        try {
             bool result = await valueTask;
             return result;
-        }
-        catch (OperationCanceledException)
-        {
+        } catch (OperationCanceledException) {
             return false;
         }
     }
@@ -31,15 +26,11 @@ public static class Extensions
     /// </summary>
     /// <param name="valueTask">The task to await</param>
     /// <returns>The original value or null if it was cancelled</returns>
-    public static async Task<T?> NoThrow<T>(this Task<T> valueTask)
-    {
-        try
-        {
+    public static async Task<T?> NoThrow<T>(this Task<T> valueTask) {
+        try {
             T result = await valueTask;
             return result;
-        }
-        catch (OperationCanceledException)
-        {
+        } catch (OperationCanceledException) {
             return default;
         }
     }

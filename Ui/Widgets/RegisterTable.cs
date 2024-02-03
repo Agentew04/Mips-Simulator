@@ -1,10 +1,5 @@
 ﻿using ImGuiNET;
 using MipsSimulator.Mips;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MipsSimulator.Ui.Widgets {
     public class RegisterTable : IWidget {
@@ -16,7 +11,7 @@ namespace MipsSimulator.Ui.Widgets {
         private readonly CpuRegisters registers;
 
         public void Show() {
-            if(ImGui.Begin("Registers")) {
+            if (ImGui.Begin("Registers")) {
                 ShowTable();
                 ImGui.End();
             }

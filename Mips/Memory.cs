@@ -1,4 +1,4 @@
-﻿namespace MipsSimulator.Mips; 
+﻿namespace MipsSimulator.Mips;
 
 public class Memory : IResettable {
     // just a big array of bytes?
@@ -12,7 +12,7 @@ public class Memory : IResettable {
     public const uint TextOffset = 0x00400000;
     public const uint KDataOffset = 0x90000000;
 
-    public Memory() : this(1024*1024*4){
+    public Memory() : this(1024 * 1024 * 4) {
     }
 
     public Memory(int capacity) {
@@ -22,13 +22,13 @@ public class Memory : IResettable {
 
     public byte this[uint index] {
         get {
-            if(index >= memorySize) {
+            if (index >= memorySize) {
                 throw new IndexOutOfRangeException();
             }
             return memory[index];
         }
         set {
-            if(index >= memorySize) {
+            if (index >= memorySize) {
                 throw new IndexOutOfRangeException();
             }
             memory[index] = value;

@@ -1,4 +1,4 @@
-﻿namespace MipsSimulator.Mips; 
+﻿namespace MipsSimulator.Mips;
 
 /// <summary>
 /// Structure to hold the values of all main registers of the CPU.
@@ -25,7 +25,7 @@ public class CpuRegisters : IResettable {
             return;
         }
 
-        if(r is >= Register.Zero and <= Register.Ra) {
+        if (r is >= Register.Zero and <= Register.Ra) {
             registers[(int)r] = value;
             return;
         }

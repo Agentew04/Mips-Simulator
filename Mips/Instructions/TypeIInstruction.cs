@@ -1,4 +1,4 @@
-﻿namespace MipsSimulator.Mips.Instructions; 
+﻿namespace MipsSimulator.Mips.Instructions;
 
 public class TypeIInstruction : IInstruction {
 

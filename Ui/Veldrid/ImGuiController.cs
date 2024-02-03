@@ -5,23 +5,18 @@
  */
 
 
-using System;
-using System.Collections.Generic;
+using ImGuiNET;
 using System.Numerics;
 using System.Reflection;
-using System.IO;
-using Veldrid;
 using System.Runtime.CompilerServices;
-using ImGuiNET;
+using Veldrid;
 
-namespace MipsSimulator.Ui.Veldrid
-{
+namespace MipsSimulator.Ui.Veldrid {
     /// <summary>
     /// A modified version of Veldrid.ImGui's ImGuiRenderer.
     /// Manages input for ImGui and handles rendering ImGui's DrawLists with Veldrid.
     /// </summary>
-    public sealed class ImGuiController : IDisposable
-    {
+    public sealed class ImGuiController : IDisposable {
         private GraphicsDevice _gd;
         private bool _frameBegun;
 
@@ -61,8 +56,7 @@ namespace MipsSimulator.Ui.Veldrid
         /// <summary>
         /// Constructs a new ImGuiController.
         /// </summary>
-        public ImGuiController(GraphicsDevice gd, OutputDescription outputDescription, int width, int height)
-        {
+        public ImGuiController(GraphicsDevice gd, OutputDescription outputDescription, int width, int height) {
             _gd = gd;
             _windowWidth = width;
             _windowHeight = height;
@@ -80,19 +74,16 @@ namespace MipsSimulator.Ui.Veldrid
             _frameBegun = true;
         }
 
-        public void WindowResized(int width, int height)
-        {
+        public void WindowResized(int width, int height) {
             _windowWidth = width;
             _windowHeight = height;
         }
 
-        public void DestroyDeviceObjects()
-        {
+        public void DestroyDeviceObjects() {
             Dispose();
         }
 
-        public void CreateDeviceResources(GraphicsDevice gd, OutputDescription outputDescription)
-        {
+        public void CreateDeviceResources(GraphicsDevice gd, OutputDescription outputDescription) {
             _gd = gd;
             ResourceFactory factory = gd.ResourceFactory;
             _vertexBuffer = factory.CreateBuffer(new BufferDescription(10000, BufferUsage.VertexBuffer | BufferUsage.Dynamic));
@@ -145,10 +136,8 @@ namespace MipsSimulator.Ui.Veldrid
         /// Gets or creates a handle for a texture to be drawn with ImGui.
         /// Pass the returned handle to Image() or ImageButton().
         /// </summary>
-        public nint GetOrCreateImGuiBinding(ResourceFactory factory, TextureView textureView)
-        {
-            if (!_setsByView.TryGetValue(textureView, out ResourceSetInfo rsi))
-            {
+        public nint GetOrCreateImGuiBinding(ResourceFactory factory, TextureView textureView) {
+            if (!_setsByView.TryGetValue(textureView, out ResourceSetInfo rsi)) {
                 ResourceSet resourceSet = factory.CreateResourceSet(new ResourceSetDescription(_textureLayout, textureView));
                 rsi = new ResourceSetInfo(GetNextImGuiBindingID(), resourceSet);
 
@@ -160,8 +149,7 @@ namespace MipsSimulator.Ui.Veldrid
             return rsi.ImGuiBinding;
         }
 
-        private nint GetNextImGuiBindingID()
-        {
+        private nint GetNextImGuiBindingID() {
             int newID = _lastAssignedID++;
             return newID;
         }
@@ -170,10 +158,8 @@ namespace MipsSimulator.Ui.Veldrid
         /// Gets or creates a handle for a texture to be drawn with ImGui.
         /// Pass the returned handle to Image() or ImageButton().
         /// </summary>
-        public nint GetOrCreateImGuiBinding(ResourceFactory factory, Texture texture)
-        {
-            if (!_autoViewsByTexture.TryGetValue(texture, out TextureView textureView))
-            {
+        public nint GetOrCreateImGuiBinding(ResourceFactory factory, Texture texture) {
+            if (!_autoViewsByTexture.TryGetValue(texture, out TextureView textureView)) {
                 textureView = factory.CreateTextureView(texture);
                 _autoViewsByTexture.Add(texture, textureView);
                 _ownedResources.Add(textureView);
@@ -185,20 +171,16 @@ namespace MipsSimulator.Ui.Veldrid
         /// <summary>
         /// Retrieves the shader texture binding for the given helper handle.
         /// </summary>
-        public ResourceSet GetImageResourceSet(nint imGuiBinding)
-        {
-            if (!_viewsById.TryGetValue(imGuiBinding, out ResourceSetInfo tvi))
-            {
+        public ResourceSet GetImageResourceSet(nint imGuiBinding) {
+            if (!_viewsById.TryGetValue(imGuiBinding, out ResourceSetInfo tvi)) {
                 throw new InvalidOperationException("No registered ImGui binding with id " + imGuiBinding.ToString());
             }
 
             return tvi.ResourceSet;
         }
 
-        public void ClearCachedImageResources()
-        {
-            foreach (IDisposable resource in _ownedResources)
-            {
+        public void ClearCachedImageResources() {
+            foreach (IDisposable resource in _ownedResources) {
                 resource.Dispose();
             }
 
@@ -209,27 +191,21 @@ namespace MipsSimulator.Ui.Veldrid
             _lastAssignedID = 100;
         }
 
-        private byte[] LoadEmbeddedShaderCode(ResourceFactory factory, string name, ShaderStages stage)
-        {
-            switch (factory.BackendType)
-            {
-                case GraphicsBackend.Direct3D11:
-                    {
+        private byte[] LoadEmbeddedShaderCode(ResourceFactory factory, string name, ShaderStages stage) {
+            switch (factory.BackendType) {
+                case GraphicsBackend.Direct3D11: {
                         string resourceName = name + ".hlsl.bytes";
                         return GetEmbeddedResourceBytes(resourceName);
                     }
-                case GraphicsBackend.OpenGL:
-                    {
+                case GraphicsBackend.OpenGL: {
                         string resourceName = name + ".glsl";
                         return GetEmbeddedResourceBytes(resourceName);
                     }
-                case GraphicsBackend.Vulkan:
-                    {
+                case GraphicsBackend.Vulkan: {
                         string resourceName = name + ".spv";
                         return GetEmbeddedResourceBytes(resourceName);
                     }
-                case GraphicsBackend.Metal:
-                    {
+                case GraphicsBackend.Metal: {
                         string resourceName = name + ".metallib";
                         return GetEmbeddedResourceBytes(resourceName);
                     }
@@ -238,11 +214,9 @@ namespace MipsSimulator.Ui.Veldrid
             }
         }
 
-        private byte[] GetEmbeddedResourceBytes(string resourceName)
-        {
+        private byte[] GetEmbeddedResourceBytes(string resourceName) {
             Assembly assembly = typeof(ImGuiController).Assembly;
-            using (Stream s = assembly.GetManifestResourceStream(resourceName))
-            {
+            using (Stream s = assembly.GetManifestResourceStream(resourceName)) {
                 byte[] ret = new byte[s.Length];
                 s.Read(ret, 0, (int)s.Length);
                 return ret;
@@ -252,8 +226,7 @@ namespace MipsSimulator.Ui.Veldrid
         /// <summary>
         /// Recreates the device texture used to render text.
         /// </summary>
-        public void RecreateFontDeviceTexture(GraphicsDevice gd)
-        {
+        public void RecreateFontDeviceTexture(GraphicsDevice gd) {
             ImGuiIOPtr io = ImGui.GetIO();
             // Build
             nint pixels;
@@ -293,10 +266,8 @@ namespace MipsSimulator.Ui.Veldrid
         /// or index data has increased beyond the capacity of the existing buffers.
         /// A <see cref="CommandList"/> is needed to submit drawing and resource update commands.
         /// </summary>
-        public void Render(GraphicsDevice gd, CommandList cl)
-        {
-            if (_frameBegun)
-            {
+        public void Render(GraphicsDevice gd, CommandList cl) {
+            if (_frameBegun) {
                 _frameBegun = false;
                 ImGui.Render();
                 RenderImDrawData(ImGui.GetDrawData(), gd, cl);
@@ -306,10 +277,8 @@ namespace MipsSimulator.Ui.Veldrid
         /// <summary>
         /// Updates ImGui input and IO configuration state.
         /// </summary>
-        public void Update(float deltaSeconds, InputSnapshot snapshot)
-        {
-            if (_frameBegun)
-            {
+        public void Update(float deltaSeconds, InputSnapshot snapshot) {
+            if (_frameBegun) {
                 ImGui.Render();
             }
 
@@ -324,8 +293,7 @@ namespace MipsSimulator.Ui.Veldrid
         /// Sets per-frame data based on the associated window.
         /// This is called by Update(float).
         /// </summary>
-        private void SetPerFrameImGuiData(float deltaSeconds)
-        {
+        private void SetPerFrameImGuiData(float deltaSeconds) {
             ImGuiIOPtr io = ImGui.GetIO();
             io.DisplaySize = new Vector2(
                 _windowWidth / _scaleFactor.X,
@@ -334,16 +302,13 @@ namespace MipsSimulator.Ui.Veldrid
             io.DeltaTime = deltaSeconds; // DeltaTime is in seconds.
         }
 
-        private bool TryMapKey(Key key, out ImGuiKey result)
-        {
-            ImGuiKey KeyToImGuiKeyShortcut(Key keyToConvert, Key startKey1, ImGuiKey startKey2)
-            {
+        private bool TryMapKey(Key key, out ImGuiKey result) {
+            ImGuiKey KeyToImGuiKeyShortcut(Key keyToConvert, Key startKey1, ImGuiKey startKey2) {
                 int changeFromStart1 = (int)keyToConvert - (int)startKey1;
                 return startKey2 + changeFromStart1;
             }
 
-            result = key switch
-            {
+            result = key switch {
                 >= Key.F1 and <= Key.F24 => KeyToImGuiKeyShortcut(key, Key.F1, ImGuiKey.F1),
                 >= Key.Keypad0 and <= Key.Keypad9 => KeyToImGuiKeyShortcut(key, Key.Keypad0, ImGuiKey.Keypad0),
                 >= Key.A and <= Key.Z => KeyToImGuiKeyShortcut(key, Key.A, ImGuiKey.A),
@@ -396,8 +361,7 @@ namespace MipsSimulator.Ui.Veldrid
             return result != ImGuiKey.None;
         }
 
-        private void UpdateImGuiInput(InputSnapshot snapshot)
-        {
+        private void UpdateImGuiInput(InputSnapshot snapshot) {
             ImGuiIOPtr io = ImGui.GetIO();
             io.AddMousePosEvent(snapshot.MousePosition.X, snapshot.MousePosition.Y);
             io.AddMouseButtonEvent(0, snapshot.IsMouseDown(MouseButton.Left));
@@ -406,47 +370,39 @@ namespace MipsSimulator.Ui.Veldrid
             io.AddMouseButtonEvent(3, snapshot.IsMouseDown(MouseButton.Button1));
             io.AddMouseButtonEvent(4, snapshot.IsMouseDown(MouseButton.Button2));
             io.AddMouseWheelEvent(0f, snapshot.WheelDelta);
-            for (int i = 0; i < snapshot.KeyCharPresses.Count; i++)
-            {
+            for (int i = 0; i < snapshot.KeyCharPresses.Count; i++) {
                 io.AddInputCharacter(snapshot.KeyCharPresses[i]);
             }
 
-            for (int i = 0; i < snapshot.KeyEvents.Count; i++)
-            {
+            for (int i = 0; i < snapshot.KeyEvents.Count; i++) {
                 KeyEvent keyEvent = snapshot.KeyEvents[i];
-                if (TryMapKey(keyEvent.Key, out ImGuiKey imguikey))
-                {
+                if (TryMapKey(keyEvent.Key, out ImGuiKey imguikey)) {
                     io.AddKeyEvent(imguikey, keyEvent.Down);
                 }
             }
         }
 
-        private void RenderImDrawData(ImDrawDataPtr draw_data, GraphicsDevice gd, CommandList cl)
-        {
+        private void RenderImDrawData(ImDrawDataPtr draw_data, GraphicsDevice gd, CommandList cl) {
             uint vertexOffsetInVertices = 0;
             uint indexOffsetInElements = 0;
 
-            if (draw_data.CmdListsCount == 0)
-            {
+            if (draw_data.CmdListsCount == 0) {
                 return;
             }
 
             uint totalVBSize = (uint)(draw_data.TotalVtxCount * Unsafe.SizeOf<ImDrawVert>());
-            if (totalVBSize > _vertexBuffer.SizeInBytes)
-            {
+            if (totalVBSize > _vertexBuffer.SizeInBytes) {
                 gd.DisposeWhenIdle(_vertexBuffer);
                 _vertexBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)(totalVBSize * 1.5f), BufferUsage.VertexBuffer | BufferUsage.Dynamic));
             }
 
             uint totalIBSize = (uint)(draw_data.TotalIdxCount * sizeof(ushort));
-            if (totalIBSize > _indexBuffer.SizeInBytes)
-            {
+            if (totalIBSize > _indexBuffer.SizeInBytes) {
                 gd.DisposeWhenIdle(_indexBuffer);
                 _indexBuffer = gd.ResourceFactory.CreateBuffer(new BufferDescription((uint)(totalIBSize * 1.5f), BufferUsage.IndexBuffer | BufferUsage.Dynamic));
             }
 
-            for (int i = 0; i < draw_data.CmdListsCount; i++)
-            {
+            for (int i = 0; i < draw_data.CmdListsCount; i++) {
                 ImDrawListPtr cmd_list = draw_data.CmdLists[i];
 
                 cl.UpdateBuffer(
@@ -487,26 +443,17 @@ namespace MipsSimulator.Ui.Veldrid
             // Render command lists
             int vtx_offset = 0;
             int idx_offset = 0;
-            for (int n = 0; n < draw_data.CmdListsCount; n++)
-            {
+            for (int n = 0; n < draw_data.CmdListsCount; n++) {
                 ImDrawListPtr cmd_list = draw_data.CmdLists[n];
-                for (int cmd_i = 0; cmd_i < cmd_list.CmdBuffer.Size; cmd_i++)
-                {
+                for (int cmd_i = 0; cmd_i < cmd_list.CmdBuffer.Size; cmd_i++) {
                     ImDrawCmdPtr pcmd = cmd_list.CmdBuffer[cmd_i];
-                    if (pcmd.UserCallback != nint.Zero)
-                    {
+                    if (pcmd.UserCallback != nint.Zero) {
                         throw new NotImplementedException();
-                    }
-                    else
-                    {
-                        if (pcmd.TextureId != nint.Zero)
-                        {
-                            if (pcmd.TextureId == _fontAtlasID)
-                            {
+                    } else {
+                        if (pcmd.TextureId != nint.Zero) {
+                            if (pcmd.TextureId == _fontAtlasID) {
                                 cl.SetGraphicsResourceSet(1, _fontTextureResourceSet);
-                            }
-                            else
-                            {
+                            } else {
                                 cl.SetGraphicsResourceSet(1, GetImageResourceSet(pcmd.TextureId));
                             }
                         }
@@ -529,8 +476,7 @@ namespace MipsSimulator.Ui.Veldrid
         /// <summary>
         /// Frees all graphics resources used by the renderer.
         /// </summary>
-        public void Dispose()
-        {
+        public void Dispose() {
             _vertexBuffer.Dispose();
             _indexBuffer.Dispose();
             _projMatrixBuffer.Dispose();
@@ -543,19 +489,16 @@ namespace MipsSimulator.Ui.Veldrid
             _pipeline.Dispose();
             _mainResourceSet.Dispose();
 
-            foreach (IDisposable resource in _ownedResources)
-            {
+            foreach (IDisposable resource in _ownedResources) {
                 resource.Dispose();
             }
         }
 
-        private struct ResourceSetInfo
-        {
+        private struct ResourceSetInfo {
             public readonly nint ImGuiBinding;
             public readonly ResourceSet ResourceSet;
 
-            public ResourceSetInfo(nint imGuiBinding, ResourceSet resourceSet)
-            {
+            public ResourceSetInfo(nint imGuiBinding, ResourceSet resourceSet) {
                 ImGuiBinding = imGuiBinding;
                 ResourceSet = resourceSet;
             }

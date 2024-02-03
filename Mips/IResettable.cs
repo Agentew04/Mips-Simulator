@@ -1,4 +1,4 @@
-﻿namespace MipsSimulator.Mips; 
+﻿namespace MipsSimulator.Mips;
 
 /// <summary>
 /// Interface to signal that a component can be reseted

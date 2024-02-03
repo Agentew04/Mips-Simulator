@@ -2,15 +2,13 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
 namespace MipsSimulator.Ui.Veldrid;
 
-public sealed class WindowManager : IDisposable, IWindowManager
-{
+public sealed class WindowManager : IDisposable, IWindowManager {
 
     #region Private Variables
 
@@ -33,8 +31,7 @@ public sealed class WindowManager : IDisposable, IWindowManager
 
     #endregion
 
-    public void Init(int width, int height)
-    {
+    public void Init(int width, int height) {
         window = VeldridStartup.CreateWindow(new WindowCreateInfo(50, 50, width, height, WindowState.Normal, Title));
         graphicsDevice = VeldridStartup.CreateDefaultOpenGLGraphicsDevice(
             options: new GraphicsDeviceOptions(true, null, true, ResourceBindingModel.Improved, true, true),
@@ -42,8 +39,7 @@ public sealed class WindowManager : IDisposable, IWindowManager
             GraphicsBackend.OpenGL);
 
 
-        window.Resized += () =>
-        {
+        window.Resized += () => {
             graphicsDevice.MainSwapchain.Resize((uint)window.Width, (uint)window.Height);
             imGuiRenderer.WindowResized(window.Width, window.Height);
             WindowWidth = window.Width;
@@ -56,19 +52,16 @@ public sealed class WindowManager : IDisposable, IWindowManager
 
     }
 
-    public void Start()
-    {
+    public void Start() {
         Stopwatch sw = new();
         float deltaTime;
         ImGui.PushFont(font);
 
-        while (window.Exists && !closeWindow)
-        {
+        while (window.Exists && !closeWindow) {
             deltaTime = sw.ElapsedTicks / (float)Stopwatch.Frequency;
             sw.Restart();
             InputSnapshot snapshot = window.PumpEvents();
-            if (!window.Exists)
-            {
+            if (!window.Exists) {
                 break;
             }
             // passa pro renderer que deveria passar pro imgui
@@ -89,32 +82,27 @@ public sealed class WindowManager : IDisposable, IWindowManager
         OnCloseWindow?.Invoke();
     }
 
-    private unsafe void LoadFont()
-    {
+    private unsafe void LoadFont() {
         Assembly asm = Assembly.GetExecutingAssembly();
         using Stream? s = asm.GetManifestResourceStream("Resources/Fonts/JetBrainsMono-Regular.ttf");
-        if (s is null)
-        {
+        if (s is null) {
             return;
         }
 
         byte[] buffer = new byte[s.Length];
         s.Read(buffer);
-        fixed (byte* bufferPtr = buffer)
-        {
+        fixed (byte* bufferPtr = buffer) {
             font = ImGui.GetIO().Fonts.AddFontFromMemoryTTF((nint)bufferPtr, buffer.Length, 16);
         }
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         imGuiRenderer.Dispose();
         commandList.Dispose();
         graphicsDevice.Dispose();
     }
 
-    public void CloseWindow()
-    {
+    public void CloseWindow() {
         closeWindow = true;
     }
 

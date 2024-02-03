@@ -1,17 +1,15 @@
 ﻿using ImGuiNET;
+using Silk.NET.Input;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
+using Silk.NET.Windowing;
+using System.Drawing;
 using System.Numerics;
 using System.Reflection;
-using Silk.NET.Windowing;
-using Silk.NET.Input;
-using Silk.NET.OpenGL;
-using Silk.NET.OpenGL.Extensions.ImGui;
-using Silk.NET.Maths;
-using System.Drawing;
 
 namespace MipsSimulator.Ui.Silk.NET;
 
-public sealed class WindowManager : IDisposable, IWindowManager
-{
+public sealed class WindowManager : IDisposable, IWindowManager {
 
     #region Private Variables
 
@@ -19,7 +17,7 @@ public sealed class WindowManager : IDisposable, IWindowManager
     private IWindow window = null!;
     private GL gl = null!;
     IInputContext inputContext = null!;
-    
+
     private ImGuiController imguiController = null!;
     private ImFontPtr? font = null;
 
@@ -35,8 +33,7 @@ public sealed class WindowManager : IDisposable, IWindowManager
 
     #endregion
 
-    public void Init(int width, int height)
-    {
+    public void Init(int width, int height) {
         window = Window.Create(WindowOptions.Default);
 
         window.Load += WindowLoad;
@@ -71,11 +68,11 @@ public sealed class WindowManager : IDisposable, IWindowManager
         gl.ClearColor(Color.FromArgb((int)(ClearColor.X * 255), (int)(ClearColor.Y * 255), (int)(ClearColor.Z * 255)));
         gl.Clear((uint)ClearBufferMask.ColorBufferBit);
 
-        if(font is not null) {
+        if (font is not null) {
             ImGui.PushFont(font.Value);
         }
         OnSubmitUI?.Invoke();
-        if(font is not null) {
+        if (font is not null) {
             ImGui.PopFont();
         }
 
@@ -94,7 +91,7 @@ public sealed class WindowManager : IDisposable, IWindowManager
     private unsafe void LoadFont() {
         Assembly asm = Assembly.GetExecutingAssembly();
         using Stream? s = asm.GetManifestResourceStream("MipsSimulator.Resources/Fonts/JetBrainsMono-Regular.ttf");
-        if(s is null) {
+        if (s is null) {
             return;
         }
 
@@ -105,8 +102,7 @@ public sealed class WindowManager : IDisposable, IWindowManager
         }
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         window.Dispose();
     }
 

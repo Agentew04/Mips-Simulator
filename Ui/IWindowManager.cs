@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MipsSimulator.Ui {
+﻿namespace MipsSimulator.Ui {
     public interface IWindowManager {
         public void Init(int width, int height);
         public void Start();

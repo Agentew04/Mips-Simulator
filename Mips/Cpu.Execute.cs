@@ -1,6 +1,6 @@
 ﻿using MipsSimulator.Mips.Instructions;
 
-namespace MipsSimulator.Mips; 
+namespace MipsSimulator.Mips;
 
 public partial class Cpu {
     private void Execute(IInstruction instruction) {
@@ -209,5 +209,5 @@ public partial class Cpu {
         }
     }
 
-    
+
 }

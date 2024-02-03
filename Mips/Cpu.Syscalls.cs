@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
-namespace MipsSimulator.Mips; 
+namespace MipsSimulator.Mips;
 public partial class Cpu {
     /// <summary>
     /// SPIM simulator compatible syscalls
@@ -19,49 +15,49 @@ public partial class Cpu {
             case 2:
                 PrintFloat();
                 break;
-                case 3:
+            case 3:
                 PrintDouble();
                 break;
-                case 4:
+            case 4:
                 PrintString();
                 break;
-                case 5:
+            case 5:
                 ReadInteger();
                 break;
-                case 6:
+            case 6:
                 ReadFloat();
                 break;
-                case 7:
+            case 7:
                 ReadDouble();
                 break;
-                case 8:
+            case 8:
                 ReadString();
                 break;
-                case 9:
+            case 9:
                 AllocateHeap();
                 break;
-                case 10:
+            case 10:
                 Exit();
                 break;
-                case 11:
+            case 11:
                 PrintCharacter();
                 break;
-                case 12:
+            case 12:
                 ReadCharacter();
                 break;
-                case 13:
+            case 13:
                 OpenFile();
                 break;
-                case 14:
+            case 14:
                 ReadFile();
                 break;
-                case 15:
+            case 15:
                 WriteFile();
                 break;
-                case 16:
+            case 16:
                 CloseFile();
                 break;
-                case 17:
+            case 17:
                 ExitWithValue();
                 break;
         }
@@ -126,7 +122,7 @@ public partial class Cpu {
         if (line.Length < maxLen) {
             line += '\n';
         } else {
-            line = line.Substring(0, maxLen-1);
+            line = line.Substring(0, maxLen - 1);
         }
 
         Span<byte> bytes = stackalloc byte[maxLen];
