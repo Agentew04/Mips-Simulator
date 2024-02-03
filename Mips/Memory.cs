@@ -35,7 +35,7 @@ public class Memory : IResettable {
         }
     }
 
-    public byte[] GetBytes(uint index, int length) {
+    public byte[] ReadBytes(uint index, int length) {
         byte[] result = new byte[length];
         Array.Copy(memory, index, result, 0, length);
         return result;
@@ -49,7 +49,7 @@ public class Memory : IResettable {
         Array.Copy(bytes, 0, memory, index, bytes.Length);
     }
 
-    public void SetBytes(uint index, ReadOnlySpan<byte> bytes) {
+    public void WriteBytes(uint index, ReadOnlySpan<byte> bytes) {
         bytes.CopyTo(memory.AsSpan((int)index, bytes.Length));
     }
 

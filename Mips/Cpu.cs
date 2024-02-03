@@ -24,7 +24,14 @@ public partial class Cpu : IResettable {
     /// The memory of the computer. basically big array with some helper methods
     /// </summary>
     public Memory Memory { get; } = new Memory();
-    
+
+    private StreamReader? inStream = null;
+    private StreamWriter? outStream = null;
+
+    public void SetIOStream(StreamReader @in, StreamWriter @out) {
+        inStream = @in;
+        outStream = @out;
+    }
 
     public void Step() {
         // fetch

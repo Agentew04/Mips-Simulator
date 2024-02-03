@@ -41,10 +41,10 @@ public class LogicThread {
         registerTable = new(cpu.Registers);
         consoleLog = new();
         
-        // small program
-        cpu.Memory.WriteWord(0, 0x24080001); // li t0, 1
-        cpu.Memory.WriteWord(4, 0x24090002); // li t1, 2
-        cpu.Memory.WriteWord(8, 0x01095020); // add t2, t0, t1
+        // load test program
+        for (int j = 0; j < TestProgram.Length; j++) {
+            cpu.Memory.WriteWord((uint)j * 4, TestProgram[j]);
+        }
 
         int i = 0;
         using PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
@@ -65,6 +65,12 @@ public class LogicThread {
     { // main thread
         thread.Join();
     }
+
+    private readonly uint[] TestProgram = [
+        0x24080001 , // li t0, 1
+        0x24090002 , // li t1, 2
+        0x01095020 , // add t2, t0, t1
+        ];
 
     #region Event Handlers
 

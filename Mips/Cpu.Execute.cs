@@ -209,7 +209,5 @@ public partial class Cpu {
         }
     }
 
-    private void Syscall() {
-
-    }
+    
 }
