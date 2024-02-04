@@ -9,6 +9,7 @@ namespace MipsSimulator;
 
 public class Program {
 
+    [STAThread]
     static void Main(string[] args) {
         using WindowManager windowManager = new();
         LogicThread logicThread = new(windowManager);

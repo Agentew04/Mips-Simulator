@@ -1,5 +1,6 @@
 ﻿using MipsSimulator.Mips.Runtime;
 using MipsSimulator.Mips.Runtime.Instructions;
+using System.Numerics;
 
 namespace MipsSimulator.Mips;
 
@@ -85,5 +86,28 @@ public partial class Cpu : IResettable {
         Memory.Reset();
     }
 
+    // TODO create a Program class to hold each segment
+    public void LoadProgram(string textpath, string datapath) {
+        // load text segment
+        Span<byte> wordbuffer = stackalloc byte[4]; // one word
+        using (FileStream fs = new(textpath, FileMode.Open)) {
+            uint position = (uint)Memory.SegmentType.Text;
+            while (fs.Read(wordbuffer) > 0) {
+                uint word = BitConverter.ToUInt32(wordbuffer);
+                Memory.WriteWord(position, word);
+                position += 4;
+            }
+            Registers[Register.Pc] = (uint)Memory.SegmentType.Text;
+        }
 
+        // load data segment
+        using (FileStream fs = new(datapath, FileMode.Open)) {
+            uint position = (uint)Memory.SegmentType.Data;
+            while (fs.Read(wordbuffer) > 0) {
+                uint word = BitConverter.ToUInt32(wordbuffer);
+                Memory.WriteWord(position, word);
+                position += 4;
+            }
+        }
+    }
 }

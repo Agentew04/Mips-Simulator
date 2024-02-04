@@ -74,12 +74,18 @@ public class LogicThread {
 
     #region Event Handlers
 
+    /// <summary>
+    /// This function will run on the main UI thread, not on the logic thread!!
+    /// </summary>
     private void SubmitUI() {
         CreateDockSpace(true, false);
         if (ImGui.BeginMainMenuBar()) {
             if (ImGui.BeginMenu("File")) {
                 ImGui.MenuItem("New", "CTRL+N");
-                ImGui.MenuItem("Open", "CTRL+O");
+                if(ImGui.MenuItem("Open", "CTRL+O")) {
+                    var (textSgm, dataSgm) = FilePicker.OpenFile();
+                    cpu.LoadProgram(textSgm, dataSgm);
+                }
                 ImGui.MenuItem("Save", "CTRL+S");
                 ImGui.MenuItem("Save As", "CTRL+SHIFT+S");
                 ImGui.EndMenu();
