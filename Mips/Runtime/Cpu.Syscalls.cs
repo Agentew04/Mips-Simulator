@@ -36,7 +36,7 @@ public partial class Cpu {
                 ReadDouble();
                 break;
             case 8:
-                ReadString();
+                await ReadString();
                 break;
             case 9:
                 AllocateHeap();
@@ -48,7 +48,7 @@ public partial class Cpu {
                 PrintCharacter();
                 break;
             case 12:
-                ReadCharacter();
+                await ReadCharacter();
                 break;
             case 13:
                 OpenFile();

@@ -4,9 +4,9 @@ using MipsSimulator.Mips.Runtime.Instructions;
 namespace MipsSimulator.Mips;
 
 public partial class Cpu {
-    private void Execute(IInstruction instruction) {
+    private async Task Execute(IInstruction instruction) {
         if (instruction is TypeRInstruction r) {
-            ExecuteTypeR(r);
+            await ExecuteTypeR(r);
         } else if (instruction is TypeIInstruction i) {
             ExecuteTypeI(i);
         } else if (instruction is TypeJInstruction j) {
@@ -14,7 +14,7 @@ public partial class Cpu {
         }
     }
 
-    private void ExecuteTypeR(TypeRInstruction instruction) {
+    private async Task ExecuteTypeR(TypeRInstruction instruction) {
         switch (instruction.Function) {
             case Function.Sll:
                 Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rt) << (int)instruction.Shamt);
@@ -54,7 +54,7 @@ public partial class Cpu {
                 Registers.SetRegister(Register.Pc, Registers.GetRegister(instruction.Rs));
                 break;
             case Function.Syscall:
-                Syscall();
+                await Syscall();
                 break;
             case Function.Mfhi:
                 Registers.SetRegister(instruction.Rd, Registers.GetRegister(Register.Hi));
@@ -82,7 +82,7 @@ public partial class Cpu {
                 break;
             case Function.Add:
             case Function.Addu:
-                Registers.SetRegister(instruction.Rd, Registers.GetRegister(instruction.Rs) + Registers.GetRegister(instruction.Rt));
+                Registers[instruction.Rd] = Registers[instruction.Rs] + Registers[instruction.Rt];
                 break;
             case Function.Sub:
             case Function.Subu:

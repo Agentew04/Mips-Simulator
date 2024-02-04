@@ -4,17 +4,25 @@ using System.Numerics;
 namespace MipsSimulator.Ui.Widgets; 
 public sealed class ConsoleLog : IWidget, IDisposable {
 
-    private string lines;
+    private string text;
     private string input;
+    private int lines = 0;
 
 
     public ConsoleLog() {
-        lines = "";
+        text = "";
         input = "";
     }
 
     public void Write(string text) {
-        lines += text + "\n";
+        this.text += text + "\n";
+        lines++;
+
+        if (lines > 100) {
+            int index = this.text.IndexOf('\n');
+            this.text = this.text[(index + 1)..];
+            lines--;
+        }
     }
 
     public void Show() {
@@ -22,16 +30,16 @@ public sealed class ConsoleLog : IWidget, IDisposable {
             ImGui.InputText("##consoleinput", ref input, 80);
             ImGui.SameLine();
             if (ImGui.Button("Write")) {
-                lines += input + "\n";
+                text += input + "\n";
                 OnInput?.Invoke(input);
                 input = "";
             }
             ImGui.SameLine();
             if (ImGui.Button("Clear")) {
-                lines = "";
+                text = "";
             }
 
-            ImGui.Text(lines);
+            ImGui.Text(text);
 
             ImGui.End();
         }

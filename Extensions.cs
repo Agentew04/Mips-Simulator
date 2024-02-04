@@ -1,4 +1,6 @@
-﻿namespace MipsSimulator;
+﻿using System.Diagnostics;
+
+namespace MipsSimulator;
 
 /// <summary>
 /// Provides many useful extension methods
@@ -51,6 +53,7 @@ public static class Extensions
     /// <param name="frequency">The frequency at which the condition will be check, in milliseconds.</param>
     /// <param name="timeout">Timeout in milliseconds.</param>
     /// <exception cref="TimeoutException"></exception>
+    [DebuggerHidden]
     public static async Task WaitWhile(Func<bool> condition, int frequency = 25, int timeout = -1)
     {
         var waitTask = Task.Run(async () =>
@@ -68,6 +71,7 @@ public static class Extensions
     /// <param name="condition">The break condition.</param>
     /// <param name="frequency">The frequency at which the condition will be checked.</param>
     /// <param name="timeout">The timeout in milliseconds.</param>
+    [DebuggerHidden]
     public static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1)
     {
         var waitTask = Task.Run(async () =>

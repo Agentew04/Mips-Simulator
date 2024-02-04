@@ -48,12 +48,7 @@ public class LogicThread {
         registerTable = new(cpu.Registers);
         consoleLog = new();
         stdio = new(consoleLog);
-        cpu.SetStdIO(() => {
-            return stdin.Count > 0 ? stdin.Dequeue() : "";
-        }, consoleLog.Write);
-        consoleLog.OnInput += (input) => {
-            stdin.Enqueue(input);
-        };
+        cpu.SetStdIO(stdio);
 
         // load test program
         for (int j = 0; j < TestProgram.Length; j++) {
@@ -61,28 +56,20 @@ public class LogicThread {
         }
     }
 
-    
-
     private readonly uint[] TestProgram = [
-        // li v0, 1
-        0x24020001,
-        // li a0, 5
-        0x24040005,
-        // syscall
-        0x0000000c,
+        // read an integer from the stdin
         // li v0, 5
         0x24020005,
         // syscall
         0x0000000c,
-        // add a0, zero, v0
-        0x00842020,
+        // v0 contains the integer read, move to a0
+        // add a0, v0, zero
+        0x00022020,
+        // print the integer
         // li v0, 1
         0x24020001,
         // syscall
         0x0000000c,
-        //0x24080001, // li t0, 1
-        //0x24090002, // li t1, 2
-        //0x01095020, // add t2, t0, t1
     ];
 
     #region Event Handlers
@@ -98,30 +85,36 @@ public class LogicThread {
                 ImGui.EndMenu();
             }
 
-            if (ImGui.MenuItem("Step")) {
+            if (ImGui.MenuItem("Step", !cpu.IsProcessing)) {
                 consoleLog.Write("Step");
                 cpu.Step();
             }
 
-            if (ImGui.MenuItem("Continue")) {
+            if (ImGui.MenuItem("Continue", !cpu.IsExecuting)) {
                 consoleLog.Write("Continue");
                 cpu.Continue();
             }
 
-            if (ImGui.MenuItem("Stop")) {
+            if (ImGui.MenuItem("Stop", cpu.IsExecuting)) {
                 consoleLog.Write("stop");
                 cpu.Stop();
+            }
+
+            if (ImGui.MenuItem("Reset")) {
+                cpu.Reset();
+                for (int j = 0; j < TestProgram.Length; j++) {
+                    cpu.Memory.WriteWord((uint)j * 4, TestProgram[j]);
+                }
             }
             ImGui.EndMainMenuBar();
         }
 
         // pelo visto as docks vao sempre na esquerda
-        ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
-        ImGui.ShowDemoWindow();
+        //ImGui.DockSpaceOverViewport(ImGui.GetMainViewport(), ImGuiDockNodeFlags.NoUndocking);
+        ImGui.SetNextWindowDockID(ImGui.GetID("MyDockSpace"), ImGuiCond.FirstUseEver);
+        //ImGui.ShowDemoWindow();
 
-        ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
         consoleLog.Show();
-        ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
         registerTable.Show();
     }
 

@@ -56,6 +56,8 @@ public sealed class WindowManager : IDisposable, IWindowManager {
         gl = window.CreateOpenGL();
         inputContext = window.CreateInput();
         imguiController = new ImGuiController(gl, window, inputContext);
+        var io = ImGui.GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
     }
 
     private void WindowResize(Vector2D<int> s) {
@@ -68,19 +70,18 @@ public sealed class WindowManager : IDisposable, IWindowManager {
         gl.ClearColor(Color.FromArgb((int)(ClearColor.X * 255), (int)(ClearColor.Y * 255), (int)(ClearColor.Z * 255)));
         gl.Clear((uint)ClearBufferMask.ColorBufferBit);
 
-        //if (font is not null) {
-        //    ImGui.PushFont(font.Value);
-        //}
+        if (font is not null) {
+            ImGui.PushFont(font.Value);
+        }
         OnSubmitUI?.Invoke();
-        //if (font is not null) {
-        //    ImGui.PopFont();
-        //}
+        if (font is not null) {
+            ImGui.PopFont();
+        }
 
         imguiController.Render();
     }
 
     private void WindowClosed() {
-        ImGui.PopFont();
         imguiController.Dispose();
         inputContext.Dispose();
         gl.Dispose();
@@ -88,18 +89,9 @@ public sealed class WindowManager : IDisposable, IWindowManager {
     }
 
 
-    private unsafe void LoadFont() {
-        Assembly asm = Assembly.GetExecutingAssembly();
-        using Stream? s = asm.GetManifestResourceStream("MipsSimulator.Resources/Fonts/JetBrainsMono-Regular.ttf");
-        if (s is null) {
-            return;
-        }
-
-        byte[] buffer = new byte[s.Length];
-        s.Read(buffer);
-        fixed (byte* bufferPtr = buffer) {
-            font = ImGui.GetIO().Fonts.AddFontFromMemoryTTF((nint)bufferPtr, buffer.Length, 16);
-        }
+    private void LoadFont() {
+        var io = ImGui.GetIO();
+        //font = io.Fonts.AddFontFromFileTTF("Resources/Fonts/JetBrainsMono-Regular.ttf", 16.0f);
     }
 
     public void Dispose() {
