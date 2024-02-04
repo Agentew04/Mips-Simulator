@@ -1,45 +1,44 @@
 ﻿using ImGuiNET;
 using System.Numerics;
 
-namespace MipsSimulator.Ui.Widgets {
-    public class ConsoleLog : IWidget {
+namespace MipsSimulator.Ui.Widgets; 
+public sealed class ConsoleLog : IWidget, IDisposable {
 
-        private string lines = "";
-        private string input = "";
-        private const uint maxLenght = 160 * 200; // 160 chars per line, 200 lines
+    private string lines;
+    private string input;
 
-        public ConsoleLog() {
-            lines = "";
-        }
 
-        public void Show() {
-            if (ImGui.Begin("Console")) {
-                if (ImGui.Button("Clear")) {
-                    lines = "";
-                }
+    public ConsoleLog() {
+        lines = "";
+        input = "";
+    }
 
-                int padding = 10;
-                Vector2 windowSize = new(ImGui.GetWindowSize().X, ImGui.GetWindowSize().Y);
-                windowSize.X -= padding;
-                windowSize.Y -= 100;
-                ImGui.InputTextMultiline("Output", ref lines, maxLenght, windowSize, ImGuiInputTextFlags.ReadOnly);
+    public void Write(string text) {
+        lines += text + "\n";
+    }
 
-                ImGui.Text("Input: ");
-                ImGui.SameLine();
-                ImGui.InputText("##consoleinput", ref input, 80);
-                ImGui.SameLine();
-                if (ImGui.Button("Send")) {
-                    WriteMessage(input);
-                    input = "";
-                }
-
-                ImGui.End();
+    public void Show() {
+        if (ImGui.Begin("Console")) {
+            ImGui.InputText("##consoleinput", ref input, 80);
+            ImGui.SameLine();
+            if (ImGui.Button("Write")) {
+                lines += input + "\n";
+                OnInput?.Invoke(input);
+                input = "";
             }
-        }
+            ImGui.SameLine();
+            if (ImGui.Button("Clear")) {
+                lines = "";
+            }
 
-        public void WriteMessage(string message) {
-            lines += message + "\n";
-        }
+            ImGui.Text(lines);
 
+            ImGui.End();
+        }
+    }
+
+    public event Action<string>? OnInput;
+
+    public void Dispose() {
     }
 }

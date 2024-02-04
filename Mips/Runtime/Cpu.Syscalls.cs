@@ -1,11 +1,16 @@
 ﻿using System.Text;
+using MipsSimulator.Mips.Runtime;
 
 namespace MipsSimulator.Mips;
 public partial class Cpu {
     /// <summary>
     /// SPIM simulator compatible syscalls
     /// </summary>
-    private void Syscall() {
+    private async Task Syscall() {
+        if(stdio is null) {
+            throw new InvalidOperationException("Stdio must be set before executing a syscall");
+        }
+
         uint v0 = Registers[Register.V0];
 
         switch (v0) {
@@ -22,7 +27,7 @@ public partial class Cpu {
                 PrintString();
                 break;
             case 5:
-                ReadInteger();
+                await ReadInteger();
                 break;
             case 6:
                 ReadFloat();
@@ -66,7 +71,7 @@ public partial class Cpu {
     private void PrintInteger() {
         int a0 = (int)Registers[Register.A0];
 
-        outStream?.Write(a0.ToString());
+        stdio?.Write(a0.ToString());
     }
 
     private void PrintFloat() {
@@ -88,11 +93,12 @@ public partial class Cpu {
         while ((c = (char)Memory.ReadByte(strAddress++)) != 0) {
             sb.Append(c);
         }
-        outStream?.Write(sb.ToString());
+
+        stdio?.Write(sb.ToString());
     }
 
-    private void ReadInteger() {
-        string input = inStream?.ReadLine() ?? "";
+    private async Task ReadInteger() {
+        string input = await stdio!.Read();
         if (int.TryParse(input, out int result)) {
             Registers[Register.V0] = (uint)result;
         } else {
@@ -112,11 +118,11 @@ public partial class Cpu {
     /// <summary>
     /// Reads a null terminated string from the input stream. Follow fgets semantics
     /// </summary>
-    private void ReadString() {
+    private async Task ReadString() {
         uint bufferAddr = Registers[Register.A0];
         int maxLen = (int)Registers[Register.A1];
 
-        string line = inStream?.ReadLine() ?? ""; // ignore the input
+        string line = await stdio!.Read();
 
         // if less than maxLen append \n else pad with \0
         if (line.Length < maxLen) {
@@ -125,7 +131,7 @@ public partial class Cpu {
             line = line.Substring(0, maxLen - 1);
         }
 
-        Span<byte> bytes = stackalloc byte[maxLen];
+        byte[] bytes = new byte[maxLen];
         Encoding.ASCII.GetBytes(line, bytes);
 
         Memory.WriteBytes(bufferAddr, bytes);
@@ -143,14 +149,14 @@ public partial class Cpu {
         uint a0 = Registers[Register.A0];
         byte c = (byte)a0;
         char[] chars = Encoding.ASCII.GetChars([c]);
-        outStream?.Write(chars[0]);
+        stdio!.Write(chars[0].ToString());
     }
 
-    private void ReadCharacter() {
-        string line = inStream?.ReadLine() ?? "";
+    private async Task ReadCharacter() {
+        string line = await stdio!.Read();
 
         if (line.Length > 0) {
-            Span<byte> bytes = stackalloc byte[1];
+            byte[] bytes = new byte[1];
             Encoding.ASCII.GetBytes(line[0].ToString(), bytes);
             Registers[Register.V0] = bytes[0];
         } else {

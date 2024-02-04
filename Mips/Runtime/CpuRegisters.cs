@@ -1,36 +1,43 @@
-﻿namespace MipsSimulator.Mips;
+﻿namespace MipsSimulator.Mips.Runtime;
 
 /// <summary>
 /// Structure to hold the values of all main registers of the CPU.
 /// </summary>
-public class CpuRegisters : IResettable {
+public class CpuRegisters : IResettable
+{
 
     private uint[] registers = new uint[32];
     private uint pc = 0x0;
     private uint hi = 0x0;
     private uint lo = 0x0;
 
-    public uint this[int index] {
+    public uint this[int index]
+    {
         get => registers[index];
         set => registers[index] = value;
     }
 
-    public uint this[Register r] {
+    public uint this[Register r]
+    {
         get => GetRegister(r);
         set => SetRegister(r, value);
     }
 
-    public void SetRegister(Register r, uint value) {
-        if (r == Register.Zero) {
+    public void SetRegister(Register r, uint value)
+    {
+        if (r == Register.Zero)
+        {
             return;
         }
 
-        if (r is >= Register.Zero and <= Register.Ra) {
+        if (r is >= Register.Zero and <= Register.Ra)
+        {
             registers[(int)r] = value;
             return;
         }
 
-        switch (r) {
+        switch (r)
+        {
             case Register.Pc:
                 pc = value;
                 break;
@@ -43,11 +50,14 @@ public class CpuRegisters : IResettable {
         }
     }
 
-    public uint GetRegister(Register r) {
-        if (r is >= Register.Zero and <= Register.Ra) {
+    public uint GetRegister(Register r)
+    {
+        if (r is >= Register.Zero and <= Register.Ra)
+        {
             return registers[(int)r];
         }
-        return r switch {
+        return r switch
+        {
             Register.Pc => pc,
             Register.Hi => hi,
             Register.Lo => lo,
@@ -58,7 +68,8 @@ public class CpuRegisters : IResettable {
     /// <summary>
     /// Reset the state of the CPU registers.
     /// </summary>
-    public void Reset() {
+    public void Reset()
+    {
         registers = new uint[32];
         pc = 0x0;
         hi = 0x0;
@@ -66,7 +77,8 @@ public class CpuRegisters : IResettable {
     }
 }
 
-public enum Register {
+public enum Register
+{
     Zero = 0,
     At,
     V0,

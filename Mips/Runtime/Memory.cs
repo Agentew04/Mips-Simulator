@@ -1,6 +1,7 @@
-﻿namespace MipsSimulator.Mips;
+﻿namespace MipsSimulator.Mips.Runtime;
 
-public class Memory : IResettable {
+public class Memory : IResettable
+{
     // just a big array of bytes?
 
     private readonly int memorySize;
@@ -12,68 +13,86 @@ public class Memory : IResettable {
     public const uint TextOffset = 0x00400000;
     public const uint KDataOffset = 0x90000000;
 
-    public Memory() : this(1024 * 1024 * 4) {
+    public Memory() : this(1024 * 1024 * 4)
+    {
     }
 
-    public Memory(int capacity) {
+    public Memory(int capacity)
+    {
         memorySize = capacity;
         memory = new byte[capacity];
     }
 
-    public byte this[uint index] {
-        get {
-            if (index >= memorySize) {
+    #region Read/Write
+
+    public byte this[uint index]
+    {
+        get
+        {
+            if (index >= memorySize)
+            {
                 throw new IndexOutOfRangeException();
             }
             return memory[index];
         }
-        set {
-            if (index >= memorySize) {
+        set
+        {
+            if (index >= memorySize)
+            {
                 throw new IndexOutOfRangeException();
             }
             memory[index] = value;
         }
     }
 
-    public byte[] ReadBytes(uint index, int length) {
+    public byte[] ReadBytes(uint index, int length)
+    {
         byte[] result = new byte[length];
         Array.Copy(memory, index, result, 0, length);
         return result;
     }
 
-    public void GetBytes(uint index, Span<byte> buffer) {
+    public void GetBytes(uint index, Span<byte> buffer)
+    {
         memory.AsSpan((int)index, buffer.Length).CopyTo(buffer);
     }
 
-    public void SetBytes(uint index, byte[] bytes) {
+    public void SetBytes(uint index, byte[] bytes)
+    {
         Array.Copy(bytes, 0, memory, index, bytes.Length);
     }
 
-    public void WriteBytes(uint index, ReadOnlySpan<byte> bytes) {
+    public void WriteBytes(uint index, ReadOnlySpan<byte> bytes)
+    {
         bytes.CopyTo(memory.AsSpan((int)index, bytes.Length));
     }
 
-    public void Reset() {
+    public void Reset()
+    {
         Array.Clear(memory, 0, memory.Length);
     }
 
-    public void WriteByte(uint index, byte value) {
+    public void WriteByte(uint index, byte value)
+    {
         memory[index] = value;
     }
 
-    public void WriteHalfWord(uint index, ushort value) {
+    public void WriteHalfWord(uint index, ushort value)
+    {
         memory[index] = (byte)(value >> 8);
         memory[index + 1] = (byte)value;
     }
 
-    public void WriteWord(uint index, uint value) {
+    public void WriteWord(uint index, uint value)
+    {
         memory[index] = (byte)(value >> 24);
         memory[index + 1] = (byte)(value >> 16);
         memory[index + 2] = (byte)(value >> 8);
         memory[index + 3] = (byte)value;
     }
 
-    public void WriteDoubleWord(uint index, ulong value) {
+    public void WriteDoubleWord(uint index, ulong value)
+    {
         memory[index] = (byte)(value >> 56);
         memory[index + 1] = (byte)(value >> 48);
         memory[index + 2] = (byte)(value >> 40);
@@ -84,27 +103,35 @@ public class Memory : IResettable {
         memory[index + 7] = (byte)value;
     }
 
-    public byte ReadByte(uint index) {
+    public byte ReadByte(uint index)
+    {
         return memory[index];
     }
 
-    public ushort ReadHalfWord(uint index) {
+    public ushort ReadHalfWord(uint index)
+    {
         return (ushort)(memory[index] << 8 | memory[index + 1]);
     }
 
-    public uint ReadWord(uint index) {
+    public uint ReadWord(uint index)
+    {
         return (uint)(memory[index] << 24 | memory[index + 1] << 16 | memory[index + 2] << 8 | memory[index + 3]);
     }
 
-    public ulong ReadDoubleWord(uint index) {
+    public ulong ReadDoubleWord(uint index)
+    {
         return (ulong)(memory[index] << 56 | memory[index + 1] << 48 | memory[index + 2] << 40 | memory[index + 3] << 32 | memory[index + 4] << 24 | memory[index + 5] << 16 | memory[index + 6] << 8 | memory[index + 7]);
     }
 
-    public void GetAll(Span<byte> membuf) {
+    public void GetAll(Span<byte> membuf)
+    {
         memory.AsSpan().CopyTo(membuf);
     }
 
-    public void GetAll(byte[] membuf) {
+    public void GetAll(byte[] membuf)
+    {
         memory.CopyTo(membuf, 0);
     }
+
+    #endregion
 }

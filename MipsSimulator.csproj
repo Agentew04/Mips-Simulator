@@ -45,4 +45,8 @@
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mips\Compile\" />
+  </ItemGroup>
+
 </Project>

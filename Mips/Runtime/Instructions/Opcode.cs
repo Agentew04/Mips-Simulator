@@ -1,6 +1,7 @@
-﻿namespace MipsSimulator.Mips.Instructions;
+﻿namespace MipsSimulator.Mips.Runtime.Instructions;
 
-public enum Opcode : byte {
+public enum Opcode : byte
+{
     RType = 0,
     J = 0b000_010,
     Jal = 0b000_011,

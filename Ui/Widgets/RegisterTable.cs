@@ -1,7 +1,8 @@
 ﻿using ImGuiNET;
-using MipsSimulator.Mips;
+using MipsSimulator.Mips.Runtime;
 
-namespace MipsSimulator.Ui.Widgets {
+namespace MipsSimulator.Ui.Widgets
+{
     public class RegisterTable : IWidget {
 
         public RegisterTable(CpuRegisters registers) {

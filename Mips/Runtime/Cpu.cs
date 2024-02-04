@@ -1,4 +1,5 @@
-﻿using MipsSimulator.Mips.Instructions;
+﻿using MipsSimulator.Mips.Runtime;
+using MipsSimulator.Mips.Runtime.Instructions;
 
 namespace MipsSimulator.Mips;
 
@@ -19,12 +20,10 @@ public partial class Cpu : IResettable {
     /// </summary>
     public Memory Memory { get; } = new Memory();
 
-    private StreamReader? inStream = null;
-    private StreamWriter? outStream = null;
-
-    public void SetIOStream(StreamReader @in, StreamWriter @out) {
-        inStream = @in;
-        outStream = @out;
+    private ConsoleIO? stdio = null;
+    
+    public void SetStdIO(ConsoleIO io) {
+        stdio = io;
     }
 
     public void Step() {

@@ -1,6 +1,7 @@
-﻿namespace MipsSimulator.Mips.Instructions;
+﻿namespace MipsSimulator.Mips.Runtime.Instructions;
 
-public enum Function : byte {
+public enum Function : byte
+{
     /// <summary>
     /// Shift left logical. Shifts RT left by SHAMT and stores the result in RD
     /// </summary>

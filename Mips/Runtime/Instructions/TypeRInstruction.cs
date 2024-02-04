@@ -1,6 +1,7 @@
-﻿namespace MipsSimulator.Mips.Instructions;
+﻿namespace MipsSimulator.Mips.Runtime.Instructions;
 
-public class TypeRInstruction : IInstruction {
+public class TypeRInstruction : IInstruction
+{
 
     public Register Rs { get; init; }
 

@@ -1,11 +1,15 @@
 ﻿using ImGuiNET;
 using MipsSimulator.Mips;
+using MipsSimulator.Mips.Runtime;
 using MipsSimulator.Ui.Widgets;
 using System.Numerics;
 
 namespace MipsSimulator.Ui;
 
 public class LogicThread {
+
+    #region Main Thread
+
     public LogicThread(IWindowManager windowManager) {
         this.windowManager = windowManager;
         cts = new();
@@ -17,36 +21,6 @@ public class LogicThread {
         thread = new Thread(Main);
     }
 
-    #region Private Variables
-
-    private readonly IWindowManager windowManager;
-    private readonly Thread thread;
-    private readonly CancellationTokenSource cts;
-    private Cpu cpu;
-    private RegisterTable registerTable;
-    private ConsoleLog consoleLog;
-
-    #endregion
-
-    private async void Main() {
-        cpu = new();
-        registerTable = new(cpu.Registers);
-        consoleLog = new();
-
-        // load test program
-        for (int j = 0; j < TestProgram.Length; j++) {
-            cpu.Memory.WriteWord((uint)j * 4, TestProgram[j]);
-        }
-
-        int i = 0;
-        using PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
-        while (await timer.WaitForNextTickAsync(cts.Token).NoThrow()) {
-            i++;
-            Console.WriteLine($"Main: {i}");
-        }
-        Console.WriteLine("bye");
-    }
-
     public void Start() { // main thread
         thread.Start();
     }
@@ -55,10 +29,60 @@ public class LogicThread {
         thread.Join();
     }
 
+    #endregion
+
+    #region Private Variables
+
+    private readonly IWindowManager windowManager;
+    private readonly Thread thread;
+    private readonly CancellationTokenSource cts;
+    private Cpu cpu;
+    private RegisterTable registerTable;
+    private ConsoleLog consoleLog;
+    private ConsoleIO stdio;
+
+    #endregion
+
+    private void Main() {
+        cpu = new();
+        registerTable = new(cpu.Registers);
+        consoleLog = new();
+        stdio = new(consoleLog);
+        cpu.SetStdIO(() => {
+            return stdin.Count > 0 ? stdin.Dequeue() : "";
+        }, consoleLog.Write);
+        consoleLog.OnInput += (input) => {
+            stdin.Enqueue(input);
+        };
+
+        // load test program
+        for (int j = 0; j < TestProgram.Length; j++) {
+            cpu.Memory.WriteWord((uint)j * 4, TestProgram[j]);
+        }
+    }
+
+    
+
     private readonly uint[] TestProgram = [
-        0x24080001, // li t0, 1
-        0x24090002, // li t1, 2
-        0x01095020, // add t2, t0, t1
+        // li v0, 1
+        0x24020001,
+        // li a0, 5
+        0x24040005,
+        // syscall
+        0x0000000c,
+        // li v0, 5
+        0x24020005,
+        // syscall
+        0x0000000c,
+        // add a0, zero, v0
+        0x00842020,
+        // li v0, 1
+        0x24020001,
+        // syscall
+        0x0000000c,
+        //0x24080001, // li t0, 1
+        //0x24090002, // li t1, 2
+        //0x01095020, // add t2, t0, t1
     ];
 
     #region Event Handlers
@@ -75,17 +99,17 @@ public class LogicThread {
             }
 
             if (ImGui.MenuItem("Step")) {
-                consoleLog.WriteMessage("Step");
+                consoleLog.Write("Step");
                 cpu.Step();
             }
 
             if (ImGui.MenuItem("Continue")) {
-                consoleLog.WriteMessage("Continue");
+                consoleLog.Write("Continue");
                 cpu.Continue();
             }
 
             if (ImGui.MenuItem("Stop")) {
-                consoleLog.WriteMessage("stop");
+                consoleLog.Write("stop");
                 cpu.Stop();
             }
             ImGui.EndMainMenuBar();

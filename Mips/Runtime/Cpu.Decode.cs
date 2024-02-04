@@ -1,4 +1,5 @@
-﻿using MipsSimulator.Mips.Instructions;
+﻿using MipsSimulator.Mips.Runtime;
+using MipsSimulator.Mips.Runtime.Instructions;
 
 namespace MipsSimulator.Mips;
 public partial class Cpu {

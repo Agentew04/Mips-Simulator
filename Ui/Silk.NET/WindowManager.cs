@@ -68,13 +68,13 @@ public sealed class WindowManager : IDisposable, IWindowManager {
         gl.ClearColor(Color.FromArgb((int)(ClearColor.X * 255), (int)(ClearColor.Y * 255), (int)(ClearColor.Z * 255)));
         gl.Clear((uint)ClearBufferMask.ColorBufferBit);
 
-        if (font is not null) {
-            ImGui.PushFont(font.Value);
-        }
+        //if (font is not null) {
+        //    ImGui.PushFont(font.Value);
+        //}
         OnSubmitUI?.Invoke();
-        if (font is not null) {
-            ImGui.PopFont();
-        }
+        //if (font is not null) {
+        //    ImGui.PopFont();
+        //}
 
         imguiController.Render();
     }
